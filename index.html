@@ -1,0 +1,2793 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Productivity Tracker</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    --panel: rgba(255,255,255,0.10);
+    --text: #ffffff;
+    --muted: #cbd5d8;
+    --primary: #00c6ff;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    color: var(--text);
+    background: var(--background);
+    background-attachment: fixed;
+    transition: background 0.5s ease;
+}
+
+#main_content {
+    min-height: 100vh;
+    padding: 30px 20px;
+}
+
+#main_body {
+    width: 1150px;
+    max-width: 100%;
+    margin: auto;
+    padding: 30px;
+    background: var(--panel);
+    backdrop-filter: blur(15px);
+    border-radius: 25px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 38px;
+}
+
+.header p {
+    color: var(--muted);
+}
+
+.streak_box {
+    text-align: center;
+    padding: 20px;
+    margin-bottom: 25px;
+    border-radius: 18px;
+    background: linear-gradient(
+        135deg,
+        rgba(255,140,0,0.25),
+        rgba(255,50,50,0.18)
+    );
+}
+
+.streak_label {
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.streak_number {
+    font-size: 48px;
+    font-weight: bold;
+}
+
+.streak_bonus {
+    color: #ffd54a;
+    font-weight: bold;
+}
+
+.wallet {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.currency_card {
+    padding: 20px;
+    border-radius: 18px;
+    text-align: center;
+    background: rgba(0,0,0,0.20);
+}
+
+.currency_card h3 {
+    margin: 0 0 10px;
+}
+
+.currency_amount {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.health {
+    color: #65e572;
+}
+
+.productivity {
+    color: #ffd84d;
+}
+
+.growth {
+    color: #d6a5ff;
+}
+
+.market_main_button {
+    width: 100%;
+    padding: 15px;
+    margin: 0 0 25px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg,#ff8a00,#ff3d00);
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.market_main_button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255,100,0,0.35);
+}
+
+.statistics {
+    display: grid;
+    grid-template-columns: repeat(5,1fr);
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.stat {
+    padding: 18px;
+    text-align: center;
+    border-radius: 15px;
+    background: rgba(255,255,255,0.10);
+}
+
+.stat h2 {
+    margin: 0;
+}
+
+.stat p {
+    margin: 7px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.section_title {
+    margin: 25px 0 15px;
+    font-size: 22px;
+}
+
+.input_area {
+    display: grid;
+    grid-template-columns: 1fr 300px 140px;
+    gap: 10px;
+}
+
+#task_input,
+#category_input {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    outline: none;
+    border-radius: 10px;
+    font-size: 15px;
+}
+
+#add_task {
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    background: linear-gradient(135deg,var(--primary),#0072ff);
+}
+
+#add_task:hover {
+    transform: translateY(-2px);
+}
+
+.point_info {
+    margin: 10px 0 25px;
+    color: var(--muted);
+    font-size: 13px;
+    text-align: center;
+}
+
+.category_info {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.category_card {
+    padding: 14px;
+    border-radius: 12px;
+    text-align: center;
+    background: rgba(255,255,255,0.08);
+}
+
+.category_card strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.category_card span {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.task {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    background: white;
+    color: #222;
+}
+
+.task_left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.task_left input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.task_text.completed {
+    color: #888;
+    text-decoration: line-through;
+}
+
+.task_category {
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.category_health {
+    background: #d8f8df;
+    color: #16803c;
+}
+
+.category_productivity {
+    background: #fff1bd;
+    color: #956d00;
+}
+
+.category_growth {
+    background: #eadcff;
+    color: #7435a8;
+}
+
+.task_reward {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.delete_button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 7px;
+    background: #ff4b5c;
+    color: white;
+    cursor: pointer;
+}
+
+.calendar_container {
+    padding: 20px;
+    border-radius: 15px;
+    background: rgba(0,0,0,0.15);
+    overflow-x: auto;
+}
+
+.calendar_header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(53,14px);
+    grid-template-rows: repeat(7,14px);
+    grid-auto-flow: column;
+    gap: 4px;
+    min-width: 950px;
+}
+
+.day {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    background: #263238;
+}
+
+.day:hover {
+    outline: 2px solid white;
+}
+
+.level-1 {
+    background: #9be9a8;
+}
+
+.level-2 {
+    background: #40c463;
+}
+
+.level-3 {
+    background: #30a14e;
+}
+
+.level-4 {
+    background: #216e39;
+}
+
+.history_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 35px 0 15px;
+}
+
+.history_buttons button {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+}
+
+#export_button {
+    background: linear-gradient(135deg,#11998e,#38ef7d);
+}
+
+#clear_button {
+    background: #555;
+    margin-left: 5px;
+}
+
+.table_container {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 12px;
+    background: white;
+}
+
+table {
+    width: 100%;
+    min-width: 1100px;
+    border-collapse: collapse;
+    color: #222;
+}
+
+th {
+    padding: 12px;
+    text-align: left;
+    background: #1f4e78;
+    color: white;
+}
+
+td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+#market_modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0,0,0,0.80);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.market_box {
+    width: 1000px;
+    max-width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 25px;
+    border-radius: 22px;
+    background: #182b33;
+    box-shadow: 0 20px 70px rgba(0,0,0,0.6);
+}
+
+.market_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.market_header h2 {
+    margin: 0;
+}
+
+#close_market {
+    border: none;
+    background: transparent;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.market_balance {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.market_coin {
+    padding: 14px;
+    border-radius: 12px;
+    text-align: center;
+    background: rgba(255,255,255,0.08);
+}
+
+.market_conversion {
+    margin: 15px 0 25px;
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    background: rgba(255,255,255,0.07);
+    color: #dce7ea;
+}
+
+.market_category {
+    margin-bottom: 30px;
+}
+
+.market_category h3 {
+    margin-bottom: 15px;
+}
+
+.shop_grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 15px;
+}
+
+.shop_item {
+    padding: 15px;
+    border-radius: 15px;
+    background: rgba(255,255,255,0.08);
+}
+
+.theme_preview {
+    height: 100px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.theme_preview::after {
+    content: "✦";
+    position: absolute;
+    right: 15px;
+    bottom: 5px;
+    font-size: 45px;
+    color: rgba(255,255,255,0.35);
+}
+
+.shop_item h4 {
+    margin: 5px 0;
+}
+
+.shop_item p {
+    color: #bdcbd0;
+    font-size: 13px;
+}
+
+.buy_button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #0072ff;
+    color: white;
+    font-weight: bold;
+}
+
+.buy_button:disabled {
+    background: #555;
+    cursor: not-allowed;
+}
+
+.spider_preview {
+    background:
+        radial-gradient(
+            circle at center,
+            transparent 0 22%,
+            rgba(255,255,255,0.25) 23%,
+            transparent 24%
+        ),
+        repeating-radial-gradient(
+            circle at center,
+            transparent 0 20px,
+            rgba(255,255,255,0.16) 21px 22px
+        ),
+        linear-gradient(
+            135deg,
+            #050505 0%,
+            #b30000 32%,
+            #ed1c24 50%,
+            #061b70 68%,
+            #001b5e 100%
+        );
+}
+
+@media(max-width:850px) {
+
+    .wallet,
+    .category_info {
+        grid-template-columns: 1fr;
+    }
+
+    .statistics {
+        grid-template-columns: repeat(2,1fr);
+    }
+
+    .input_area {
+        grid-template-columns: 1fr;
+    }
+
+    .shop_grid {
+        grid-template-columns: 1fr;
+    }
+
+    .market_balance {
+        grid-template-columns: 1fr;
+    }
+
+    .history_header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .task {
+        flex-wrap: wrap;
+    }
+}
+</style>
+
+</head>
+
+<body>
+
+<div id="main_content">
+
+<div id="main_body">
+
+<div class="header">
+
+
+<h1>⚡ My Productivity Tracker</h1>
+
+<p>
+    Complete tasks. Build your streak.
+    Earn coins. Upgrade your world.
+</p>
+
+
+</div>
+
+<div class="streak_box">
+
+
+<div class="streak_label">
+    🔥 CURRENT STREAK
+</div>
+
+<div
+    class="streak_number"
+    id="current_streak"
+>
+    0
+</div>
+
+<div
+    class="streak_bonus"
+    id="streak_bonus"
+>
+    Next milestone: 5 days
+</div>
+
+
+</div>
+
+<div class="wallet">
+
+
+<div class="currency_card">
+
+    <h3 class="health">
+        🥗 Health Coins
+    </h3>
+
+    <div
+        class="currency_amount health"
+        id="health_coins"
+    >
+        0 💚
+    </div>
+
+</div>
+
+<div class="currency_card">
+
+    <h3 class="productivity">
+        ⚡ Productivity Coins
+    </h3>
+
+    <div
+        class="currency_amount productivity"
+        id="productivity_coins"
+    >
+        0 💛
+    </div>
+
+</div>
+
+<div class="currency_card">
+
+    <h3 class="growth">
+        🌱 Growth Coins
+    </h3>
+
+    <div
+        class="currency_amount growth"
+        id="growth_coins"
+    >
+        0 💜
+    </div>
+
+</div>
+
+
+</div>
+
+<button
+class="market_main_button"
+onclick="openMarket()"
+
+>
+
+
+🛒 OPEN THEME MARKET
+
+
+</button>
+
+<div class="statistics">
+
+
+<div class="stat">
+    <h2 id="total_tasks">0</h2>
+    <p>Total Tasks</p>
+</div>
+
+<div class="stat">
+    <h2 id="completed_tasks">0</h2>
+    <p>Completed</p>
+</div>
+
+<div class="stat">
+    <h2 id="pending_tasks">0</h2>
+    <p>Pending</p>
+</div>
+
+<div class="stat">
+    <h2 id="total_points">0</h2>
+    <p>Total Points</p>
+</div>
+
+<div class="stat">
+    <h2 id="bonus_points">0</h2>
+    <p>Streak Bonus</p>
+</div>
+
+
+</div>
+
+<div class="section_title">
+    📝 Add Task
+</div>
+
+<div class="input_area">
+
+
+<input
+    type="text"
+    id="task_input"
+    placeholder="What do you need to do?"
+>
+
+<select id="category_input">
+
+    <option value="Health">
+        🥗 Health — 15 Points → 5 Coins
+    </option>
+
+    <option value="Productivity">
+        ⚡ Productivity — 25 Points → 10 Coins
+    </option>
+
+    <option value="Growth">
+        🌱 Growth — 20 Points → 8 Coins
+    </option>
+
+</select>
+
+<button id="add_task">
+    + Add Task
+</button>
+
+
+</div>
+
+<div class="point_info">
+    No manual point input. Your category automatically determines your reward.
+</div>
+
+<div class="category_info">
+
+
+<div class="category_card">
+
+    <strong class="health">
+        🥗 Health
+    </strong>
+
+    <span>
+        15 Points → 5 💚 Coins
+    </span>
+
+</div>
+
+<div class="category_card">
+
+    <strong class="productivity">
+        ⚡ Productivity
+    </strong>
+
+    <span>
+        25 Points → 10 💛 Coins
+    </span>
+
+</div>
+
+<div class="category_card">
+
+    <strong class="growth">
+        🌱 Growth
+    </strong>
+
+    <span>
+        20 Points → 8 💜 Coins
+    </span>
+
+</div>
+
+
+</div>
+
+<div class="section_title">
+    📝 Today's Tasks
+</div>
+
+<div id="task_list"></div>
+
+<div class="section_title">
+    📅 Productivity Activity
+</div>
+
+<div class="calendar_container">
+
+
+<div class="calendar_header">
+
+    <strong>
+        GitHub-style Activity
+    </strong>
+
+    <span id="calendar_year"></span>
+
+</div>
+
+<div
+    class="calendar"
+    id="calendar"
+></div>
+
+
+</div>
+
+<div class="history_header">
+
+
+<h2>
+    📊 Task History
+</h2>
+
+<div class="history_buttons">
+
+    <button id="export_button">
+        📥 Export to Excel
+    </button>
+
+    <button id="clear_button">
+        Clear Records
+    </button>
+
+</div>
+
+
+</div>
+
+<div class="table_container">
+
+<table>
+
+<thead>
+
+<tr>
+    <th>ID</th>
+    <th>Task</th>
+    <th>Category</th>
+    <th>Currency</th>
+    <th>Date Added</th>
+    <th>Status</th>
+    <th>Date Completed</th>
+    <th>Base Points</th>
+    <th>Streak Bonus</th>
+    <th>Total Points</th>
+    <th>Coins</th>
+</tr>
+
+</thead>
+
+<tbody id="history_table"></tbody>
+
+</table>
+
+</div>
+
+</div>
+</div>
+
+<div id="market_modal">
+
+<div class="market_box">
+
+<div class="market_header">
+
+
+<h2>
+    🛒 Theme Market
+</h2>
+
+<button id="close_market">
+    ×
+</button>
+
+
+</div>
+
+<p style="color:#bdcbd0;">
+    One Market — use your Health, Productivity,
+    and Growth coins to unlock themes.
+</p>
+
+<div class="market_balance">
+
+
+<div class="market_coin health">
+    💚 Health Coins
+    <strong>
+        <br>
+        <span id="market_health">0</span>
+    </strong>
+</div>
+
+<div class="market_coin productivity">
+    💛 Productivity Coins
+    <strong>
+        <br>
+        <span id="market_productivity">0</span>
+    </strong>
+</div>
+
+<div class="market_coin growth">
+    💜 Growth Coins
+    <strong>
+        <br>
+        <span id="market_growth">0</span>
+    </strong>
+</div>
+
+
+</div>
+
+<div class="market_conversion">
+
+
+<strong>
+    💰 Category Rewards
+</strong>
+
+<br><br>
+
+🥗 15 Health Points = 5 💚 Coins
+&nbsp; | &nbsp;
+
+⚡ 25 Productivity Points = 10 💛 Coins
+&nbsp; | &nbsp;
+
+🌱 20 Growth Points = 8 💜 Coins
+
+
+</div>
+
+<div id="market_content"></div>
+
+</div>
+</div>
+
+<script>
+
+const categoryData = {
+
+    Health: {
+        points: 15,
+        coins: 5,
+        currency: "Health",
+        icon: "💚"
+    },
+
+    Productivity: {
+        points: 25,
+        coins: 10,
+        currency: "Productivity",
+        icon: "💛"
+    },
+
+    Growth: {
+        points: 20,
+        coins: 8,
+        currency: "Growth",
+        icon: "💜"
+    }
+
+};
+
+
+let tasks =
+    JSON.parse(
+        localStorage.getItem(
+            "productivityTasks"
+        )
+    ) || [];
+
+
+let currencies =
+    JSON.parse(
+        localStorage.getItem(
+            "productivityCurrencies"
+        )
+    ) || {
+
+        Health: 0,
+        Productivity: 0,
+        Growth: 0
+
+    };
+
+
+/*
+    Handles old saved data from the
+    previous version.
+
+    Study is now Growth.
+    */
+
+if (
+    currencies.Study !== undefined &&
+    currencies.Growth === 0
+) {
+
+    currencies.Growth =
+        currencies.Study;
+
+}
+
+delete currencies.Study;
+
+
+if (
+    currencies.Health === undefined
+) {
+
+    currencies.Health = 0;
+
+}
+
+if (
+    currencies.Productivity === undefined
+) {
+
+    currencies.Productivity = 0;
+
+}
+
+if (
+    currencies.Growth === undefined
+) {
+
+    currencies.Growth = 0;
+
+}
+
+
+let ownedThemes =
+    JSON.parse(
+        localStorage.getItem(
+            "productivityThemes"
+        )
+    ) || ["default"];
+
+
+let activeTheme =
+    localStorage.getItem(
+        "activeProductivityTheme"
+    ) || "default";
+
+
+const themes = [
+
+    {
+        id: "default",
+        name: "Ocean Productivity",
+        category: "Special",
+        price: 0,
+        currency: "Productivity",
+        background:
+            "linear-gradient(135deg,#0f2027,#203a43,#2c5364)"
+    },
+
+    {
+        id: "spider",
+        name: "Web Hero",
+        category: "Superhero",
+        price: 25,
+        currency: "Productivity",
+        background:
+            "radial-gradient(circle at center,transparent 0 22%,rgba(255,255,255,0.25) 23%,transparent 24%),repeating-radial-gradient(circle at center,transparent 0 20px,rgba(255,255,255,0.16) 21px 22px),linear-gradient(135deg,#050505 0%,#b30000 32%,#ed1c24 50%,#061b70 68%,#001b5e 100%)"
+    },
+
+    {
+        id: "spider_red",
+        name: "Web Red",
+        category: "Superhero",
+        price: 35,
+        currency: "Productivity",
+        background:
+            "radial-gradient(circle at center,rgba(255,255,255,0.12),transparent 35%),repeating-linear-gradient(45deg,transparent 0 15px,rgba(255,255,255,0.10) 16px 17px),linear-gradient(135deg,#330000,#e00000,#ff3030)"
+    },
+
+    {
+        id: "spider_blue",
+        name: "Web Blue",
+        category: "Superhero",
+        price: 30,
+        currency: "Growth",
+        background:
+            "radial-gradient(circle at center,rgba(255,255,255,0.15),transparent 35%),repeating-linear-gradient(45deg,transparent 0 15px,rgba(255,255,255,0.10) 16px 17px),linear-gradient(135deg,#020b2e,#063d9e,#0878ff)"
+    },
+
+    {
+        id: "comic",
+        name: "Comic Power",
+        category: "Superhero",
+        price: 40,
+        currency: "Productivity",
+        background:
+            "linear-gradient(135deg,#ff512f,#f09819,#16222a)"
+    },
+
+    {
+        id: "hero_night",
+        name: "Hero Night",
+        category: "Superhero",
+        price: 45,
+        currency: "Growth",
+        background:
+            "linear-gradient(135deg,#000000,#16213e,#0f3460)"
+    },
+
+    {
+        id: "pink_flower",
+        name: "Pink Blossom",
+        category: "Girly & Flower",
+        price: 15,
+        currency: "Health",
+        background:
+            "linear-gradient(135deg,#ff9a9e,#fad0c4)"
+    },
+
+    {
+        id: "lavender",
+        name: "Lavender Garden",
+        category: "Girly & Flower",
+        price: 25,
+        currency: "Growth",
+        background:
+            "linear-gradient(135deg,#a18cd1,#fbc2eb)"
+    },
+
+    {
+        id: "rose_garden",
+        name: "Rose Garden",
+        category: "Girly & Flower",
+        price: 35,
+        currency: "Health",
+        background:
+            "linear-gradient(135deg,#f953c6,#b91d73)"
+    },
+
+    {
+        id: "forest",
+        name: "Forest",
+        category: "Forest",
+        price: 15,
+        currency: "Health",
+        background:
+            "linear-gradient(135deg,#134e5e,#71b280)"
+    },
+
+    {
+        id: "deep_forest",
+        name: "Deep Forest",
+        category: "Forest",
+        price: 25,
+        currency: "Health",
+        background:
+            "linear-gradient(135deg,#0f2027,#203a43,#2c7744)"
+    },
+
+    {
+        id: "mystic_forest",
+        name: "Mystic Forest",
+        category: "Forest",
+        price: 40,
+        currency: "Growth",
+        background:
+            "linear-gradient(135deg,#283c86,#45a247)"
+    },
+
+    {
+        id: "ocean",
+        name: "Ocean",
+        category: "Ocean",
+        price: 20,
+        currency: "Growth",
+        background:
+            "linear-gradient(135deg,#00c6ff,#0072ff)"
+    },
+
+    {
+        id: "deep_ocean",
+        name: "Deep Ocean",
+        category: "Ocean",
+        price: 30,
+        currency: "Growth",
+        background:
+            "linear-gradient(135deg,#000428,#004e92)"
+    },
+
+    {
+        id: "night",
+        name: "Midnight",
+        category: "Night",
+        price: 25,
+        currency: "Growth",
+        background:
+            "linear-gradient(135deg,#141e30,#243b55)"
+    },
+
+    {
+        id: "neon_night",
+        name: "Neon Night",
+        category: "Night",
+        price: 50,
+        currency: "Productivity",
+        background:
+            "linear-gradient(135deg,#000428,#004e92,#6a11cb)"
+    }
+
+];
+
+
+const taskInput =
+    document.getElementById(
+        "task_input"
+    );
+
+const categoryInput =
+    document.getElementById(
+        "category_input"
+    );
+
+const taskList =
+    document.getElementById(
+        "task_list"
+    );
+
+const historyTable =
+    document.getElementById(
+        "history_table"
+    );
+
+const calendar =
+    document.getElementById(
+        "calendar"
+    );
+
+
+function saveData() {
+
+    localStorage.setItem(
+        "productivityTasks",
+        JSON.stringify(tasks)
+    );
+
+    localStorage.setItem(
+        "productivityCurrencies",
+        JSON.stringify(currencies)
+    );
+
+    localStorage.setItem(
+        "productivityThemes",
+        JSON.stringify(ownedThemes)
+    );
+
+    localStorage.setItem(
+        "activeProductivityTheme",
+        activeTheme
+    );
+
+}
+
+
+function getDateKey(date) {
+
+    return [
+
+        date.getFullYear(),
+
+        String(
+            date.getMonth() + 1
+        ).padStart(2,"0"),
+
+        String(
+            date.getDate()
+        ).padStart(2,"0")
+
+    ].join("-");
+
+}
+
+
+function getCompletedDays() {
+
+    const dates = new Set();
+
+    tasks.forEach(
+        task => {
+
+            if (
+                task.completed &&
+                task.completedDateKey
+            ) {
+
+                dates.add(
+                    task.completedDateKey
+                );
+
+            }
+
+        }
+    );
+
+    return dates;
+
+}
+
+
+function calculateStreak() {
+
+    const completedDays =
+        getCompletedDays();
+
+    let currentDate =
+        new Date();
+
+    const today =
+        getDateKey(
+            currentDate
+        );
+
+    if (
+        !completedDays.has(today)
+    ) {
+
+        currentDate.setDate(
+            currentDate.getDate() - 1
+        );
+
+    }
+
+    let streak = 0;
+
+    while (
+        completedDays.has(
+            getDateKey(
+                currentDate
+            )
+        )
+    ) {
+
+        streak++;
+
+        currentDate.setDate(
+            currentDate.getDate() - 1
+        );
+
+    }
+
+    return streak;
+
+}
+
+
+function isStreakMilestone(streak) {
+
+    return (
+        streak > 0 &&
+        streak % 5 === 0
+    );
+
+}
+
+
+function getNextMilestone(streak) {
+
+    return (
+        Math.floor(
+            streak / 5
+        ) + 1
+    ) * 5;
+
+}
+
+
+function addTask() {
+
+    const taskName =
+        taskInput.value.trim();
+
+    const category =
+        categoryInput.value;
+
+    if (
+        taskName === ""
+    ) {
+
+        alert(
+            "Please enter a task."
+        );
+
+        return;
+
+    }
+
+    const basePoints =
+        categoryData[
+            category
+        ].points;
+
+    const now =
+        new Date();
+
+    const task = {
+
+        id: Date.now(),
+
+        task: taskName,
+
+        category: category,
+
+        basePoints: basePoints,
+
+        bonusPoints: 0,
+
+        totalPoints: basePoints,
+
+        coins: 0,
+
+        dateAdded:
+            now.toLocaleString(),
+
+        dateKey:
+            getDateKey(now),
+
+        completed: false,
+
+        completedDateKey: "",
+
+        dateCompleted: "",
+
+        streakAtCompletion: 0
+
+    };
+
+    tasks.push(task);
+
+    taskInput.value = "";
+
+    taskInput.focus();
+
+    saveData();
+
+    render();
+
+}
+
+
+function toggleTask(id) {
+
+    const task =
+        tasks.find(
+            item =>
+                item.id === id
+        );
+
+    if (!task) return;
+
+    if (!task.completed) {
+
+        const now =
+            new Date();
+
+        const completionDate =
+            getDateKey(now);
+
+        const previousCompletedDays =
+            getCompletedDays();
+
+        previousCompletedDays.delete(
+            completionDate
+        );
+
+        let streakBeforeToday = 0;
+
+        let checkDate =
+            new Date(now);
+
+        checkDate.setDate(
+            checkDate.getDate() - 1
+        );
+
+        while (
+            previousCompletedDays.has(
+                getDateKey(
+                    checkDate
+                )
+            )
+        ) {
+
+            streakBeforeToday++;
+
+            checkDate.setDate(
+                checkDate.getDate() - 1
+            );
+
+        }
+
+        const newStreak =
+            streakBeforeToday + 1;
+
+        const bonus =
+            isStreakMilestone(
+                newStreak
+            )
+            ? 5
+            : 0;
+
+        const total =
+            task.basePoints +
+            bonus;
+
+        const coins =
+            categoryData[
+                task.category
+            ].coins;
+
+        task.bonusPoints =
+            bonus;
+
+        task.totalPoints =
+            total;
+
+        task.coins =
+            coins;
+
+        task.completed =
+            true;
+
+        task.completedDateKey =
+            completionDate;
+
+        task.dateCompleted =
+            now.toLocaleString();
+
+        task.streakAtCompletion =
+            newStreak;
+
+        currencies[
+            task.category
+        ] += coins;
+
+    } else {
+
+        currencies[
+            task.category
+        ] -= task.coins;
+
+        if (
+            currencies[
+                task.category
+            ] < 0
+        ) {
+
+            currencies[
+                task.category
+            ] = 0;
+
+        }
+
+        task.completed =
+            false;
+
+        task.completedDateKey =
+            "";
+
+        task.dateCompleted =
+            "";
+
+        task.bonusPoints =
+            0;
+
+        task.totalPoints =
+            task.basePoints;
+
+        task.coins =
+            0;
+
+        task.streakAtCompletion =
+            0;
+
+    }
+
+    saveData();
+
+    render();
+
+}
+
+
+function deleteTask(id) {
+
+    const task =
+        tasks.find(
+            item =>
+                item.id === id
+        );
+
+    if (!task) return;
+
+    if (
+        !confirm(
+            "Delete this task?"
+        )
+    ) {
+
+        return;
+
+    }
+
+    if (
+        task.completed
+    ) {
+
+        currencies[
+            task.category
+        ] -= task.coins;
+
+        if (
+            currencies[
+                task.category
+            ] < 0
+        ) {
+
+            currencies[
+                task.category
+            ] = 0;
+
+        }
+
+    }
+
+    tasks =
+        tasks.filter(
+            item =>
+                item.id !== id
+        );
+
+    saveData();
+
+    render();
+
+}
+
+
+function renderTasks() {
+
+    taskList.innerHTML = "";
+
+    const today =
+        getDateKey(
+            new Date()
+        );
+
+    const todayTasks =
+        tasks.filter(
+            task =>
+                task.dateKey === today
+        );
+
+    if (
+        todayTasks.length === 0
+    ) {
+
+        taskList.innerHTML = `
+            <p style="
+                text-align:center;
+                color:#cbd8dc;
+            ">
+                No tasks for today.
+            </p>
+        `;
+
+        return;
+
+    }
+
+    todayTasks.forEach(
+        task => {
+
+            const element =
+                document.createElement(
+                    "div"
+                );
+
+            element.className =
+                "task";
+
+            let categoryClass =
+                "";
+
+            if (
+                task.category ===
+                "Health"
+            ) {
+
+                categoryClass =
+                    "category_health";
+
+            } else if (
+                task.category ===
+                "Productivity"
+            ) {
+
+                categoryClass =
+                    "category_productivity";
+
+            } else {
+
+                categoryClass =
+                    "category_growth";
+
+            }
+
+            const categoryIcon =
+                categoryData[
+                    task.category
+                ].icon;
+
+            element.innerHTML = `
+
+                <div class="task_left">
+
+                    <input
+                        type="checkbox"
+                        ${
+                            task.completed
+                            ? "checked"
+                            : ""
+                        }
+                        onchange="
+                            toggleTask(
+                                ${task.id}
+                            )
+                        "
+                    >
+
+                    <span class="${
+                        task.completed
+                        ? "task_text completed"
+                        : "task_text"
+                    }">
+
+                        ${
+                            escapeHTML(
+                                task.task
+                            )
+                        }
+
+                    </span>
+
+                </div>
+
+                <span class="
+                    task_category
+                    ${categoryClass}
+                ">
+
+                    ${categoryIcon}
+                    ${task.category}
+
+                </span>
+
+                <span class="task_reward">
+
+                    ${
+                        task.completed
+                        ? "+" +
+                          task.totalPoints +
+                          " pts"
+                        : task.basePoints +
+                          " pts"
+                    }
+
+                </span>
+
+                ${
+                    task.completed &&
+                    task.bonusPoints > 0
+                    ?
+                    `
+                    <span style="
+                        color:#ff9800;
+                        font-size:12px;
+                        font-weight:bold;
+                    ">
+                        🔥 +5 STREAK
+                    </span>
+                    `
+                    :
+                    ""
+                }
+
+                ${
+                    task.completed
+                    ?
+                    `
+                    <span style="
+                        font-size:12px;
+                        font-weight:bold;
+                    ">
+                        +${task.coins}
+                        ${categoryData[
+                            task.category
+                        ].icon}
+                    </span>
+                    `
+                    :
+                    ""
+                }
+
+                <button
+                    class="delete_button"
+                    onclick="
+                        deleteTask(
+                            ${task.id}
+                        )
+                    "
+                >
+                    Delete
+                </button>
+
+            `;
+
+            taskList.appendChild(
+                element
+            );
+
+        }
+    );
+
+}
+
+
+function updateCurrencies() {
+
+    document.getElementById(
+        "health_coins"
+    ).textContent =
+        currencies.Health +
+        " 💚";
+
+    document.getElementById(
+        "productivity_coins"
+    ).textContent =
+        currencies.Productivity +
+        " 💛";
+
+    document.getElementById(
+        "growth_coins"
+    ).textContent =
+        currencies.Growth +
+        " 💜";
+
+}
+
+
+function updateStatistics() {
+
+    const completed =
+        tasks.filter(
+            task =>
+                task.completed
+        );
+
+    const totalPoints =
+        completed.reduce(
+            (total,task) =>
+                total +
+                task.totalPoints,
+            0
+        );
+
+    const streak =
+        calculateStreak();
+
+    document.getElementById(
+        "total_tasks"
+    ).textContent =
+        tasks.length;
+
+    document.getElementById(
+        "completed_tasks"
+    ).textContent =
+        completed.length;
+
+    document.getElementById(
+        "pending_tasks"
+    ).textContent =
+        tasks.length -
+        completed.length;
+
+    document.getElementById(
+        "total_points"
+    ).textContent =
+        totalPoints;
+
+    document.getElementById(
+        "current_streak"
+    ).textContent =
+        streak;
+
+    const next =
+        getNextMilestone(
+            streak
+        );
+
+    const remaining =
+        next - streak;
+
+    if (
+        streak > 0 &&
+        streak % 5 === 0
+    ) {
+
+        document.getElementById(
+            "streak_bonus"
+        ).textContent =
+            "🔥 +5 POINT BONUS UNLOCKED!";
+
+    } else {
+
+        document.getElementById(
+            "streak_bonus"
+        ).textContent =
+            "🔥 " +
+            remaining +
+            " day(s) until +5 bonus";
+
+    }
+
+    const totalBonus =
+        completed.reduce(
+            (total,task) =>
+                total +
+                task.bonusPoints,
+            0
+        );
+
+    document.getElementById(
+        "bonus_points"
+    ).textContent =
+        totalBonus;
+
+    updateCurrencies();
+
+}
+
+
+function renderCalendar() {
+
+    calendar.innerHTML = "";
+
+    const year =
+        new Date()
+            .getFullYear();
+
+    document.getElementById(
+        "calendar_year"
+    ).textContent =
+        year;
+
+    const data = {};
+
+    tasks.forEach(
+        task => {
+
+            if (
+                !task.completed
+            ) return;
+
+            const key =
+                task.completedDateKey;
+
+            if (
+                !data[key]
+            ) {
+
+                data[key] = 0;
+
+            }
+
+            data[key] +=
+                task.totalPoints;
+
+        }
+    );
+
+    const start =
+        new Date(
+            year,
+            0,
+            1
+        );
+
+    start.setDate(
+        start.getDate() -
+        start.getDay()
+    );
+
+    const end =
+        new Date(
+            year,
+            11,
+            31
+        );
+
+    while (
+        start <= end ||
+        start.getDay() !== 0
+    ) {
+
+        const day =
+            document.createElement(
+                "div"
+            );
+
+        day.className =
+            "day";
+
+        const key =
+            getDateKey(
+                start
+            );
+
+        const points =
+            data[key] || 0;
+
+        if (
+            points > 0
+        ) {
+
+            if (
+                points <= 20
+            ) {
+
+                day.classList.add(
+                    "level-1"
+                );
+
+            } else if (
+                points <= 50
+            ) {
+
+                day.classList.add(
+                    "level-2"
+                );
+
+            } else if (
+                points <= 100
+            ) {
+
+                day.classList.add(
+                    "level-3"
+                );
+
+            } else {
+
+                day.classList.add(
+                    "level-4"
+                );
+
+            }
+
+        }
+
+        day.title =
+            key +
+            " — " +
+            points +
+            " points";
+
+        calendar.appendChild(
+            day
+        );
+
+        start.setDate(
+            start.getDate() + 1
+        );
+
+    }
+
+}
+
+
+function renderHistory() {
+
+    historyTable.innerHTML = "";
+
+    tasks.forEach(
+        (task,index) => {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+            row.innerHTML = `
+
+                <td>
+                    ${index + 1}
+                </td>
+
+                <td>
+                    ${escapeHTML(
+                        task.task
+                    )}
+                </td>
+
+                <td>
+                    ${task.category}
+                </td>
+
+                <td>
+                    ${
+                        categoryData[
+                            task.category
+                        ].icon
+                    }
+
+                    ${
+                        categoryData[
+                            task.category
+                        ].currency
+                    }
+                </td>
+
+                <td>
+                    ${task.dateAdded}
+                </td>
+
+                <td>
+                    ${
+                        task.completed
+                        ? "Completed"
+                        : "Pending"
+                    }
+                </td>
+
+                <td>
+                    ${
+                        task.dateCompleted ||
+                        "—"
+                    }
+                </td>
+
+                <td>
+                    ${task.basePoints}
+                </td>
+
+                <td>
+                    +${task.bonusPoints}
+                </td>
+
+                <td>
+                    ${task.totalPoints}
+                </td>
+
+                <td>
+                    ${task.coins}
+                </td>
+
+            `;
+
+            historyTable.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+function openMarket() {
+
+    document.getElementById(
+        "market_modal"
+    ).style.display =
+        "flex";
+
+    renderMarket();
+
+}
+
+
+function renderMarket() {
+
+    document.getElementById(
+        "market_health"
+    ).textContent =
+        currencies.Health;
+
+    document.getElementById(
+        "market_productivity"
+    ).textContent =
+        currencies.Productivity;
+
+    document.getElementById(
+        "market_growth"
+    ).textContent =
+        currencies.Growth;
+
+    const content =
+        document.getElementById(
+            "market_content"
+        );
+
+    content.innerHTML = "";
+
+    const categories = [
+
+        "Superhero",
+        "Girly & Flower",
+        "Forest",
+        "Ocean",
+        "Night",
+        "Special"
+
+    ];
+
+    categories.forEach(
+        category => {
+
+            const categoryThemes =
+                themes.filter(
+                    theme =>
+                        theme.category ===
+                        category
+                );
+
+            if (
+                categoryThemes.length === 0
+            ) return;
+
+            const section =
+                document.createElement(
+                    "div"
+                );
+
+            section.className =
+                "market_category";
+
+            let categoryIcon =
+                "✨";
+
+            if (
+                category ===
+                "Superhero"
+            )
+                categoryIcon =
+                    "🦸";
+
+            if (
+                category ===
+                "Girly & Flower"
+            )
+                categoryIcon =
+                    "🌸";
+
+            if (
+                category ===
+                "Forest"
+            )
+                categoryIcon =
+                    "🌲";
+
+            if (
+                category ===
+                "Ocean"
+            )
+                categoryIcon =
+                    "🌊";
+
+            if (
+                category ===
+                "Night"
+            )
+                categoryIcon =
+                    "🌙";
+
+            section.innerHTML = `
+
+                <h3>
+                    ${categoryIcon}
+                    ${category}
+                </h3>
+
+                <div
+                    class="shop_grid"
+                ></div>
+
+            `;
+
+            const grid =
+                section.querySelector(
+                    ".shop_grid"
+                );
+
+            categoryThemes.forEach(
+                theme => {
+
+                    const item =
+                        document.createElement(
+                            "div"
+                        );
+
+                    item.className =
+                        "shop_item";
+
+                    const owned =
+                        ownedThemes.includes(
+                            theme.id
+                        );
+
+                    const active =
+                        activeTheme ===
+                        theme.id;
+
+                    const coinIcon =
+                        theme.currency ===
+                        "Health"
+                        ? "💚"
+                        :
+                        theme.currency ===
+                        "Growth"
+                        ? "💜"
+                        :
+                        "💛";
+
+                    const canBuy =
+                        currencies[
+                            theme.currency
+                        ] >=
+                        theme.price;
+
+                    let buttonText =
+                        "";
+
+                    if (
+                        active
+                    ) {
+
+                        buttonText =
+                            "✓ Active";
+
+                    } else if (
+                        owned
+                    ) {
+
+                        buttonText =
+                            "Use Theme";
+
+                    } else {
+
+                        buttonText =
+                            "Buy " +
+                            theme.price +
+                            " " +
+                            coinIcon;
+
+                    }
+
+                    item.innerHTML = `
+
+                        <div
+                            class="theme_preview"
+                            style="
+                                background:
+                                ${theme.background};
+                            "
+                        ></div>
+
+                        <h4>
+                            ${theme.name}
+                        </h4>
+
+                        <p>
+                            ${
+                                theme.price === 0
+                                ? "FREE"
+                                :
+                                theme.price +
+                                " " +
+                                coinIcon
+                            }
+                        </p>
+
+                        <button
+                            class="buy_button"
+                            ${
+                                active ||
+                                (
+                                    !owned &&
+                                    !canBuy
+                                )
+                                ? "disabled"
+                                : ""
+                            }
+                            onclick="
+                                purchaseTheme(
+                                    '${theme.id}'
+                                )
+                            "
+                        >
+                            ${buttonText}
+                        </button>
+
+                    `;
+
+                    grid.appendChild(
+                        item
+                    );
+
+                }
+            );
+
+            content.appendChild(
+                section
+            );
+
+        }
+    );
+
+}
+
+
+function purchaseTheme(themeId) {
+
+    const theme =
+        themes.find(
+            item =>
+                item.id === themeId
+        );
+
+    if (!theme) return;
+
+    const owned =
+        ownedThemes.includes(
+            themeId
+        );
+
+    if (!owned) {
+
+        if (
+            currencies[
+                theme.currency
+            ] < theme.price
+        ) {
+
+            alert(
+                "You don't have enough coins."
+            );
+
+            return;
+
+        }
+
+        currencies[
+            theme.currency
+        ] -= theme.price;
+
+        ownedThemes.push(
+            themeId
+        );
+
+    }
+
+    activeTheme =
+        themeId;
+
+    applyTheme(
+        theme
+    );
+
+    saveData();
+
+    render();
+
+    renderMarket();
+
+}
+
+
+function applyTheme(theme) {
+
+    document.documentElement
+        .style
+        .setProperty(
+            "--background",
+            theme.background
+        );
+
+}
+
+
+document.getElementById(
+    "close_market"
+).addEventListener(
+    "click",
+    function() {
+
+        document.getElementById(
+            "market_modal"
+        ).style.display =
+            "none";
+
+    }
+);
+
+
+document.getElementById(
+    "market_modal"
+).addEventListener(
+    "click",
+    function(event) {
+
+        if (
+            event.target === this
+        ) {
+
+            this.style.display =
+                "none";
+
+        }
+
+    }
+);
+
+
+function exportToExcel() {
+
+    if (
+        tasks.length === 0
+    ) {
+
+        alert(
+            "No records to export."
+        );
+
+        return;
+
+    }
+
+    let csv =
+        "ID,Task,Category,Currency,Date Added,Status,Date Completed,Base Points,Streak Bonus,Total Points,Coins Earned\n";
+
+    tasks.forEach(
+        (task,index) => {
+
+            csv += [
+
+                index + 1,
+
+                csvSafe(
+                    task.task
+                ),
+
+                task.category,
+
+                categoryData[
+                    task.category
+                ].currency,
+
+                csvSafe(
+                    task.dateAdded
+                ),
+
+                task.completed
+                ? "Completed"
+                : "Pending",
+
+                csvSafe(
+                    task.dateCompleted ||
+                    ""
+                ),
+
+                task.basePoints,
+
+                task.bonusPoints,
+
+                task.totalPoints,
+
+                task.coins
+
+            ].join(",");
+
+            csv += "\n";
+
+        }
+    );
+
+    const blob =
+        new Blob(
+            [csv],
+            {
+                type:
+                    "text/csv;charset=utf-8;"
+            }
+        );
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+    link.href =
+        url;
+
+    link.download =
+        "productivity_tracker_records.csv";
+
+    document.body.appendChild(
+        link
+    );
+
+    link.click();
+
+    document.body.removeChild(
+        link
+    );
+
+    URL.revokeObjectURL(
+        url
+    );
+
+}
+
+
+function clearDatabase() {
+
+    if (
+        !confirm(
+            "Delete ALL tasks, coins and records?"
+        )
+    ) {
+
+        return;
+
+    }
+
+    tasks = [];
+
+    currencies = {
+
+        Health: 0,
+        Productivity: 0,
+        Growth: 0
+
+    };
+
+    saveData();
+
+    render();
+
+}
+
+
+function escapeHTML(text) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.textContent =
+        text;
+
+    return div.innerHTML;
+
+}
+
+
+function csvSafe(value) {
+
+    return '"' +
+        String(
+            value || ""
+        )
+        .replace(
+            /"/g,
+            '""'
+        ) +
+        '"';
+
+}
+
+
+function render() {
+
+    renderTasks();
+
+    renderHistory();
+
+    renderCalendar();
+
+    updateStatistics();
+
+}
+
+
+document.getElementById(
+    "add_task"
+).addEventListener(
+    "click",
+    addTask
+);
+
+
+taskInput.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key === "Enter"
+        ) {
+
+            addTask();
+
+        }
+
+    }
+);
+
+
+document.getElementById(
+    "export_button"
+).addEventListener(
+    "click",
+    exportToExcel
+);
+
+
+document.getElementById(
+    "clear_button"
+).addEventListener(
+    "click",
+    clearDatabase
+);
+
+
+const savedTheme =
+    themes.find(
+        theme =>
+            theme.id ===
+            activeTheme
+    );
+
+if (
+    savedTheme
+) {
+
+    applyTheme(
+        savedTheme
+    );
+
+}
+
+render();
+
+</script>
+
+</body>
+</html>
